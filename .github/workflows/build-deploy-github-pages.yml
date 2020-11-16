@@ -1,6 +1,6 @@
 name: .NET Core
 env:
-  PUBLISH_DIR: src/BlazorApp/bin/Release/netstandard2.1/publish/wwwroot
+  PUBLISH_DIR: src/BlazorApp/bin/Release/net5.0/publish/wwwroot
 on:
   push:
     branches: [ master ]
@@ -17,7 +17,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.301
+        dotnet-version: 5.0.100
     - name: Restore, Build and Publish
       run: dotnet publish --configuration Release src/BlazorApp/BlazorApp.csproj        
     - name: Rewrite base href
