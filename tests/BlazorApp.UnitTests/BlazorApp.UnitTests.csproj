@@ -13,8 +13,4 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.0-preview-20201020-06" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\BlazorApp\BlazorApp.csproj" />
-  </ItemGroup>
-
 </Project>
