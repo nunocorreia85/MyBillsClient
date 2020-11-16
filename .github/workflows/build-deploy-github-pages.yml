@@ -17,7 +17,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.301
+        dotnet-version: latest
     - name: Restore, Build and Publish
       run: dotnet publish --configuration Release src/BlazorApp/BlazorApp.csproj        
     - name: Rewrite base href
