@@ -1,6 +1,6 @@
 name: .NET Core
 env:
-  PUBLISH_DIR: src/BlazorApp/bin/Release/netstandard2.1/publish/wwwroot
+  PUBLISH_DIR: src/BlazorApp/bin/Release/net5.0/publish/wwwroot
 on:
   push:
     branches: [ master ]
