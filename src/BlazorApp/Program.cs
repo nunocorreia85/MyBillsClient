@@ -20,15 +20,14 @@ namespace BlazorApp
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
             builder.Services.AddMsalAuthentication(options =>
-            {                
+            {
                 builder.Configuration.Bind("AzureAdB2C", options.ProviderOptions.Authentication);
                 options.ProviderOptions.DefaultAccessTokenScopes.Add("openid");
                 options.ProviderOptions.DefaultAccessTokenScopes.Add("offline_access");
-                
+                options.ProviderOptions.DefaultAccessTokenScopes.Add("https://mybills.onmicrosoft.com/api/default");
                 // no popup window
                 options.ProviderOptions.LoginMode = "redirect";
             });
-            
 
             await builder.Build().RunAsync();
         }
