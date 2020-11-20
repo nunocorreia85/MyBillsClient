@@ -7,17 +7,40 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 
 namespace BlazorApp
 {
+    using Microsoft.AspNetCore.Components;
+    using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+    using System.Threading;
+
+    public class CustomAuthorizationMessageHandler : AuthorizationMessageHandler
+    {
+        public CustomAuthorizationMessageHandler(IAccessTokenProvider provider,
+            NavigationManager navigationManager)
+            : base(provider, navigationManager)
+        {
+            ConfigureHandler(
+                authorizedUrls: new[] { "https://mybills-apim.azure-api.net/MyBillsApi" },
+                scopes: new[] { "https://mybills.onmicrosoft.com/api/default" });            
+        }
+    }
+
     public class Program
     {
         public static async Task Main(string[] args)
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
+            
+            builder.Services.AddScoped<CustomAuthorizationMessageHandler>();
 
-            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            builder.Services.AddHttpClient("ServerAPI",
+                    client => {                        
+                        client.BaseAddress = new Uri("https://mybills-apim.azure-api.net/MyBillsApi/");
+                    })
+                .AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
 
             builder.Services.AddMsalAuthentication(options =>
             {

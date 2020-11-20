@@ -1,5 +1,5 @@
 ﻿@page "/fetchdata"
-@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
 
 <h1>Weather forecast</h1>
 
@@ -34,12 +34,29 @@ else
     </table>
 }
 
+result:
+<div>@s</div>
+
 @code {
     private WeatherForecast[] forecasts;
-
+    private string s;
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+        try
+        {
+            var client = ClientFactory.CreateClient("ServerAPI");
+            //s = await client.GetStringAsync("accounts?code=LnFrNKJjDwluO1bXp4kffFmcW2fdO9HVHSs56XEC4xL72jD6B6TYOQ==");
+            s = await client.GetStringAsync("accounts");
+        }
+        //catch (Microsoft.AspNetCore.Components.WebAssembly.Authentication.AccessTokenNotAvailableException exception)
+        //{
+        //    exception.Redirect();
+        //}
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
     }
 
     public class WeatherForecast
