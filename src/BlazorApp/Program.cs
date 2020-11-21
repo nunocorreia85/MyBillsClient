@@ -22,8 +22,8 @@ namespace BlazorApp
             : base(provider, navigationManager)
         {
             ConfigureHandler(
-                authorizedUrls: new[] { "https://mybills-apim.azure-api.net/MyBillsApi" },
-                scopes: new[] { "https://mybills.onmicrosoft.com/api/default" });            
+                authorizedUrls: new[] { "https://mybillsapi-apim.azure-api.net/MyBillsApi" },
+                scopes: new[] { "https://mybills.onmicrosoft.com/api/default" });
         }
     }
 
@@ -33,12 +33,14 @@ namespace BlazorApp
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
-            
+
             builder.Services.AddScoped<CustomAuthorizationMessageHandler>();
 
             builder.Services.AddHttpClient("ServerAPI",
-                    client => {                        
-                        client.BaseAddress = new Uri("https://mybills-apim.azure-api.net/MyBillsApi/");
+                    client =>
+                    {
+                        client.BaseAddress = new Uri("https://mybillsapi-apim.azure-api.net/MyBillsApi/");
+                        client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", "2376a12ded1247db9533b2828f5ad593");
                     })
                 .AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
 
