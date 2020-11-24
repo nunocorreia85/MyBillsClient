@@ -1,0 +1,86 @@
+@page "/account"
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IHttpClientFactory ClientFactory
+@using Syncfusion.Blazor.Inputs
+
+<div class="col-lg-12 control-section">
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                <b>Account Information</b>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                @Name
+            </div>
+            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                <SfTextBox CssClass="e-rtl" Placeholder="Account Number" FloatLabelType="@FloatLabelType.Auto" @bind-Value="@BankAccount"></SfTextBox>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                @Country
+            </div>
+            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                @PostalCode
+            </div>
+        </div>
+    </div>
+</div>
+@if (_claims.Count() > 0)
+{
+    <ul>
+        @foreach (var claim in _claims)
+        {
+            <li>@claim.Type: @claim.Value</li>
+        }
+    </ul>
+}
+<p>@_authMessage</p>
+
+@code {
+
+    private string _authMessage;
+    private string Name;
+    private string PostalCode;
+    private string BankAccount;
+    private string Country;
+    private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (!user.Identity.IsAuthenticated)
+        {
+            _authMessage = "The user is NOT authenticated.";
+            return;
+        }
+
+        _authMessage = $"{user.Identity.Name} is authenticated.";
+        _claims = user.Claims;
+        Name = user.FindFirst(c => c.Type == ClaimTypes.Name)?.Value;
+        PostalCode = user.FindFirst(c => c.Type == ClaimTypes.PostalCode)?.Value;
+        Country = user.FindFirst(c => c.Type == ClaimTypes.Country)?.Value;
+
+        try
+        {
+            var client = ClientFactory.CreateClient("ServerAPI");
+
+            var account = await client.GetStringAsync("accounts?id=1");
+            Console.WriteLine(account);
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+}

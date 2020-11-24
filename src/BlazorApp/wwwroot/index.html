@@ -8,7 +8,9 @@
     <base href="/" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
-    <link href="BlazorApp.styles.css" rel="stylesheet" />
+    <link href="css/syncfusion-blazor-icons.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="_content/Syncfusion.Blazor/styles/bootstrap4.css" />
 
     <!-- Start Single Page Apps for GitHub Pages -->
     <script type="text/javascript">
@@ -54,27 +56,31 @@
     <script src="decode.js"></script>
     <script src="_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
-    <!--<script>
-        Blazor.start({
-            loadBootResource: function (type, name, defaultUri, integrity) {
-                // For framework resources, use the precompressed .br files for faster downloads
-                // This is needed only because GitHub pages doesn't natively support Brotli (or even gzip for .dll files)
-                if (type !== 'dotnetjs' && location.hostname !== 'localhost') {
-                    return (async function () {
-                        const response = await fetch(defaultUri + '.br', { cache: 'no-cache' });
-                        if (!response.ok) {
-                            throw new Error(response.statusText);
-                        }
-                        const originalResponseBuffer = await response.arrayBuffer();
-                        const originalResponseArray = new Int8Array(originalResponseBuffer);
-                        const decompressedResponseArray = BrotliDecode(originalResponseArray);
-                        const contentType = type === 'dotnetwasm' ? 'application/wasm' : 'application/octet-stream';
-                        return new Response(decompressedResponseArray, { headers: { 'content-type': contentType } });
-                    })();
-                }
-            }
-        });
-    </script>-->
+    <script>
+        window.cultureInfo = {
+            get: () => window.localStorage['BlazorCulture'],
+            set: (value) => window.localStorage['BlazorCulture'] = value
+        };
+        //Blazor.start({
+        //    loadBootResource: function (type, name, defaultUri, integrity) {
+        //        // For framework resources, use the precompressed .br files for faster downloads
+        //        // This is needed only because GitHub pages doesn't natively support Brotli (or even gzip for .dll files)
+        //        if (type !== 'dotnetjs' && location.hostname !== 'localhost') {
+        //            return (async function () {
+        //                const response = await fetch(defaultUri + '.br', { cache: 'no-cache' });
+        //                if (!response.ok) {
+        //                    throw new Error(response.statusText);
+        //                }
+        //                const originalResponseBuffer = await response.arrayBuffer();
+        //                const originalResponseArray = new Int8Array(originalResponseBuffer);
+        //                const decompressedResponseArray = BrotliDecode(originalResponseArray);
+        //                const contentType = type === 'dotnetwasm' ? 'application/wasm' : 'application/octet-stream';
+        //                return new Response(decompressedResponseArray, { headers: { 'content-type': contentType } });
+        //            })();
+        //        }
+        //    }
+        //});
+    </script>
 </body>
 
 </html>
