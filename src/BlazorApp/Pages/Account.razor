@@ -3,33 +3,21 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IHttpClientFactory ClientFactory
-@*@using Syncfusion.Blazor.Inputs*@
+@using Syncfusion.Blazor.InPlaceEditor
 
-<div class="col-lg-12 control-section">
-    <div class="content-wrapper">
-        <div class="row">
-            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
-                <b>Account Information</b>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
-                @Name
-            </div>
-            @*<div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
-                <SfTextBox CssClass="e-rtl" Placeholder="Account Number" FloatLabelType="@FloatLabelType.Auto" @bind-Value="@BankAccount"></SfTextBox>
-            </div>*@
-        </div>
-        <div class="row">
-            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
-                @Country
-            </div>
-            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
-                @PostalCode
-            </div>
-        </div>
-    </div>
-</div>
+<table>
+    <tr>
+        <td>
+            <label class="control-label">
+                TextBox
+            </label>
+        </td>
+        <td>
+            <SfInPlaceEditor Mode="RenderMode.Inline" Type="InputType.Text" Value="@BankAccount" SubmitOnEnter="true">
+            </SfInPlaceEditor>
+        </td>
+    </tr>
+</table>
 @if (_claims.Count() > 0)
 {
     <ul>

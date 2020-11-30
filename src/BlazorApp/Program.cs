@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using BlazorApp.Shared;
 using Microsoft.JSInterop;
-//using Syncfusion.Blazor;
+using Syncfusion.Blazor;
 using System.Globalization;
 
 namespace BlazorApp
@@ -14,12 +14,12 @@ namespace BlazorApp
     {
         public static async Task Main(string[] args)
         {
-            //Syncfusion.Licensing.SyncfusionLicenseProvider
-            //    .RegisterLicense("MzU2NzAxQDMxMzgyZTMzMmUzMFdNbUtVakxBTFc5RkVNTTR5WDRvRnBaMkp0VnBoRVlyellpRTV6Nmh3a2s9");
+            Syncfusion.Licensing.SyncfusionLicenseProvider
+                .RegisterLicense("MzU2NzAxQDMxMzgyZTMzMmUzMFdNbUtVakxBTFc5RkVNTTR5WDRvRnBaMkp0VnBoRVlyellpRTV6Nmh3a2s9");
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
 
-            //builder.Services.AddSyncfusionBlazor();
+            builder.Services.AddSyncfusionBlazor();
             //builder.Services.AddSingleton(typeof(ISyncfusionStringLocalizer), typeof(SyncfusionLocalizer));
 
             // Set the default culture of the application
