@@ -4,30 +4,36 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IHttpClientFactory ClientFactory
 @using Syncfusion.Blazor.InPlaceEditor
+<div class="row">
+    <div class="col-lg-8 control-section inplace-control-section default_layout">
+        <div class="control_wrapper">
+            <table>
+                <tr>
+                    <td>
+                        <label class="control-label">
+                            Account Number
+                        </label>
+                    </td>
+                    <td>
+                        <SfInPlaceEditor Mode="RenderMode.Inline" Type="InputType.Text" Value="@BankAccount" SubmitOnEnter="true">
+                        </SfInPlaceEditor>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
 
-<table>
-    <tr>
-        <td>
-            <label class="control-label">
-                TextBox
-            </label>
-        </td>
-        <td>
-            <SfInPlaceEditor Mode="RenderMode.Inline" Type="InputType.Text" Value="@BankAccount" SubmitOnEnter="true">
-            </SfInPlaceEditor>
-        </td>
-    </tr>
-</table>
-@if (_claims.Count() > 0)
-{
-    <ul>
-        @foreach (var claim in _claims)
-        {
-            <li>@claim.Type: @claim.Value</li>
-        }
-    </ul>
-}
-<p>@_authMessage</p>
+@*@if (_claims.Count() > 0)
+    {
+        <ul>
+            @foreach (var claim in _claims)
+            {
+                <li>@claim.Type: @claim.Value</li>
+            }
+        </ul>
+    }
+    <p>@_authMessage</p>*@
 
 @code {
 
@@ -72,3 +78,65 @@
         }
     }
 }
+
+<style>
+    .inplace-control-section.default_layout .e-inplaceeditor .e-editable-component .e-clear-icon-hide,
+    .e-inplaceeditor-tip .e-editable-component .e-input-group .e-clear-icon.e-clear-icon-hide {
+        display: block;
+        visibility: hidden;
+    }
+
+    .inplace-control-section.default_layout .e-inplaceeditor .e-editable-component .e-clear-icon-hide,
+    .e-inplaceeditor-tip .e-editable-component .e-input-group .e-clear-icon.e-clear-icon-hide {
+        display: block;
+        visibility: hidden;
+    }
+    /* custom code start */
+    .inplace-control-section.default_layout .control_wrapper {
+        width: 100%;
+        max-width: 400px;
+        margin: auto;
+    }
+
+        .inplace-control-section.default_layout .control_wrapper table td {
+            width: 200px;
+            height: 100px;
+        }
+        /* custom code end */
+        .inplace-control-section.default_layout .control_wrapper .control-center {
+            text-align: center;
+        }
+
+        .inplace-control-section.default_layout .control_wrapper table td .control-label {
+            margin-bottom: 0px;
+        }
+
+    .inplace-control-section.default_layout .e-inplaceeditor {
+        height: auto;
+    }
+
+    .property-section table td {
+        width: 50%;
+    }
+
+    .property-section table div {
+        padding-left: 10px;
+        padding-top: 10px;
+    }
+
+    @@media (max-width: 1200px) {
+        .inplace-control-section.default_layout {
+            width: 100%;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .inplace-control-section .control_wrapper table tr td:nth-child(1) {
+            width: 130px;
+        }
+
+        .inplace-control-section .control_wrapper table tr td:nth-child(2) {
+            width: 200px;
+        }
+    }
+</style>

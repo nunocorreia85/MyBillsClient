@@ -1,4 +1,4 @@
-﻿namespace BlazorApp
+namespace BlazorApp
 {
     using Microsoft.AspNetCore.Components;
     using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
