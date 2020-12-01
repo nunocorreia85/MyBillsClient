@@ -17,29 +17,28 @@ namespace BlazorApp
             Syncfusion.Licensing.SyncfusionLicenseProvider
                 .RegisterLicense("MzU2NzAxQDMxMzgyZTMzMmUzMFdNbUtVakxBTFc5RkVNTTR5WDRvRnBaMkp0VnBoRVlyellpRTV6Nmh3a2s9");
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
-            builder.RootComponents.Add<App>("#app");
-
+            builder.RootComponents.Add<App>("app");
             builder.Services.AddSyncfusionBlazor();
-            //builder.Services.AddSingleton(typeof(ISyncfusionStringLocalizer), typeof(SyncfusionLocalizer));
+            builder.Services.AddSingleton(typeof(ISyncfusionStringLocalizer), typeof(SyncfusionLocalizer));
 
             // Set the default culture of the application
-            //CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
-            //CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-US");
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
+            CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-US");
 
             // Get the modified culture from culture switcher
-            //var host = builder.Build();
-            //var jsInterop = host.Services.GetRequiredService<IJSRuntime>();
-            //var result = await jsInterop.InvokeAsync<string>("cultureInfo.get");
-            //if (result != null)
-            //{
-            //    // Set the culture from culture switcher
-            //    var culture = new CultureInfo(result);
-            //    CultureInfo.DefaultThreadCurrentCulture = culture;
-            //    CultureInfo.DefaultThreadCurrentUICulture = culture;
-            //}
+            var host = builder.Build();
+            var jsInterop = host.Services.GetRequiredService<IJSRuntime>();
+            var result = await jsInterop.InvokeAsync<string>("cultureInfo.get");
+            if (result != null)
+            {
+                // Set the culture from culture switcher
+                var culture = new CultureInfo(result);
+                CultureInfo.DefaultThreadCurrentCulture = culture;
+                CultureInfo.DefaultThreadCurrentUICulture = culture;
+            }
 
             builder.Services.AddScoped<CustomAuthorizationMessageHandler>();
-            
+
             builder.Services.AddHttpClient("ServerAPI",
                     client =>
                     {
