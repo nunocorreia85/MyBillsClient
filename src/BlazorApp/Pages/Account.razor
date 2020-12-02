@@ -4,19 +4,55 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IHttpClientFactory ClientFactory
 @using Syncfusion.Blazor.InPlaceEditor
+@using Syncfusion.Blazor.Buttons
+<h1>Account</h1>
 <div class="row">
     <div class="col-lg-8 control-section inplace-control-section default_layout">
         <div class="control_wrapper">
             <table>
                 <tr>
                     <td>
-                        <label class="control-label">
-                            Account Number
-                        </label>
+                        <label class="control-label">Name</label>
                     </td>
                     <td>
-                        <SfInPlaceEditor Mode="RenderMode.Inline" Type="InputType.Text" Value="@BankAccount" SubmitOnEnter="true">
-                        </SfInPlaceEditor>
+                        <SfInPlaceEditor Mode="RenderMode.Inline" Type="InputType.Text" Value="@Name" SubmitOnEnter="false" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="control-label">Postal Code</label>
+                    </td>
+                    <td>
+                        <SfInPlaceEditor Mode="RenderMode.Inline" Type="InputType.Text" Value="@PostalCode" SubmitOnEnter="false" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="control-label">Country</label>
+                    </td>
+                    <td>
+                        <SfInPlaceEditor Mode="RenderMode.Inline" Type="InputType.Text" Value="@Country" SubmitOnEnter="false" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="control-label">Balance</label>
+                    </td>
+                    <td>
+                        <SfInPlaceEditor Mode="RenderMode.Inline" Type="InputType.Numeric" Value="@Balance" SubmitOnEnter="false" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="control-label">AccountNumber</label>
+                    </td>
+                    <td>
+                        <SfInPlaceEditor Mode="RenderMode.Inline" Type="InputType.Text" Value="@BankAccountNumber" SubmitOnEnter="false" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <SfButton>Normal</SfButton>
                     </td>
                 </tr>
             </table>
@@ -24,24 +60,15 @@
     </div>
 </div>
 
-@*@if (_claims.Count() > 0)
-    {
-        <ul>
-            @foreach (var claim in _claims)
-            {
-                <li>@claim.Type: @claim.Value</li>
-            }
-        </ul>
-    }
-    <p>@_authMessage</p>*@
-
 @code {
 
     private string _authMessage;
-    private string Name;
-    private string PostalCode;
-    private string BankAccount;
-    private string Country;
+    public string Name { get; set; }
+    public string PostalCode { get; set; }
+    public string Country { get; set; }
+    public decimal Balance { get; set; }
+    public string BankAccountNumber { get; set; }
+
     private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
 
     protected override async Task OnInitializedAsync()
@@ -63,10 +90,10 @@
 
         try
         {
-            var client = ClientFactory.CreateClient("ServerAPI");
+            var client = ClientFactory.CreateClient("serverAPI");
 
-            var account = await client.GetStringAsync("accounts?id=1");
-            Console.WriteLine(account);
+            var accountText = await client.GetStringAsync("accounts?id=0");
+            Console.WriteLine(accountText);
         }
         //catch (AccessTokenNotAvailableException exception)
         //{
@@ -77,66 +104,14 @@
             Console.WriteLine(e);
         }
     }
+
+    public class AccountModel
+    {
+        public long Id { get; set; }
+        public Guid ExternalId { get; set; }
+        public decimal Balance { get; set; }
+        public string BankAccountNumber { get; set; }
+        public bool Closed { get; set; }
+
+    }
 }
-
-<style>
-    .inplace-control-section.default_layout .e-inplaceeditor .e-editable-component .e-clear-icon-hide,
-    .e-inplaceeditor-tip .e-editable-component .e-input-group .e-clear-icon.e-clear-icon-hide {
-        display: block;
-        visibility: hidden;
-    }
-
-    .inplace-control-section.default_layout .e-inplaceeditor .e-editable-component .e-clear-icon-hide,
-    .e-inplaceeditor-tip .e-editable-component .e-input-group .e-clear-icon.e-clear-icon-hide {
-        display: block;
-        visibility: hidden;
-    }
-    /* custom code start */
-    .inplace-control-section.default_layout .control_wrapper {
-        width: 100%;
-        max-width: 400px;
-        margin: auto;
-    }
-
-        .inplace-control-section.default_layout .control_wrapper table td {
-            width: 200px;
-            height: 100px;
-        }
-        /* custom code end */
-        .inplace-control-section.default_layout .control_wrapper .control-center {
-            text-align: center;
-        }
-
-        .inplace-control-section.default_layout .control_wrapper table td .control-label {
-            margin-bottom: 0px;
-        }
-
-    .inplace-control-section.default_layout .e-inplaceeditor {
-        height: auto;
-    }
-
-    .property-section table td {
-        width: 50%;
-    }
-
-    .property-section table div {
-        padding-left: 10px;
-        padding-top: 10px;
-    }
-
-    @@media (max-width: 1200px) {
-        .inplace-control-section.default_layout {
-            width: 100%;
-        }
-    }
-
-    @@media (max-width: 768px) {
-        .inplace-control-section .control_wrapper table tr td:nth-child(1) {
-            width: 130px;
-        }
-
-        .inplace-control-section .control_wrapper table tr td:nth-child(2) {
-            width: 200px;
-        }
-    }
-</style>
