@@ -5,11 +5,16 @@
 @inject IHttpClientFactory ClientFactory
 @using Syncfusion.Blazor.InPlaceEditor
 @using Syncfusion.Blazor.Buttons
-<h1>Account</h1>
+
 <div class="row">
-    <div class="col-lg-8 control-section inplace-control-section default_layout">
+    <div class="col-lg-6 control-section inplace-control-section default_layout">
         <div class="control_wrapper">
             <table>
+                <tr>
+                    <td>
+                        <h1>Account</h1>
+                    </td>
+                </tr>
                 <tr>
                     <td>
                         <label class="control-label">Name</label>
@@ -82,7 +87,7 @@
             _authMessage = "The user is NOT authenticated.";
             return;
         }
-        
+
         ExternalId = user.FindFirst("oid")?.Value;
         Name = user.FindFirst("name")?.Value;
         PostalCode = user.FindFirst("postalCode")?.Value;
@@ -112,5 +117,6 @@
         public decimal Balance { get; set; }
         public string BankAccountNumber { get; set; }
         public bool Closed { get; set; }
+
     }
 }
