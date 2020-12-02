@@ -13,7 +13,7 @@
 </head>
 
 <body>
-    <div id="app">Loading...</div>
+    <app>Loading...</app>
 
     <div id="blazor-error-ui">
         An unhandled error has occurred.
@@ -21,11 +21,12 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js"></script>
-    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>    
     <script>
-        Blazor.start({
-            applicationCulture: 'en-GB'
-        });
+        window.cultureInfo = {
+            get: () => window.localStorage['BlazorCulture'],
+            set: (value) => window.localStorage['BlazorCulture'] = value
+        };
     </script>
 </body>
 </html>

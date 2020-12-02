@@ -57,7 +57,6 @@ namespace BlazorApp
                 options.ProviderOptions.LoginMode = "redirect";
             });
 
-            //builder.Services.AddSyncfusionBlazor();
             await builder.Build().RunAsync();
         }
     }
