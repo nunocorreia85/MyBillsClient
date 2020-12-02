@@ -68,6 +68,7 @@
     public string Country { get; set; }
     public decimal Balance { get; set; }
     public string BankAccountNumber { get; set; }
+    public string ExternalId { get; set; }
 
     private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
 
@@ -81,12 +82,11 @@
             _authMessage = "The user is NOT authenticated.";
             return;
         }
-
-        _authMessage = $"{user.Identity.Name} is authenticated.";
-        _claims = user.Claims;
-        Name = user.FindFirst(c => c.Type == ClaimTypes.Name)?.Value;
-        PostalCode = user.FindFirst(c => c.Type == ClaimTypes.PostalCode)?.Value;
-        Country = user.FindFirst(c => c.Type == ClaimTypes.Country)?.Value;
+        
+        ExternalId = user.FindFirst("oid")?.Value;
+        Name = user.FindFirst("name")?.Value;
+        PostalCode = user.FindFirst("postalCode")?.Value;
+        Country = user.FindFirst("country")?.Value;
 
         try
         {
@@ -112,6 +112,5 @@
         public decimal Balance { get; set; }
         public string BankAccountNumber { get; set; }
         public bool Closed { get; set; }
-
     }
 }

@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorApp.UnitTests", "test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorApp", "src\BlazorApp\BlazorApp.csproj", "{3D7AB4F7-5717-4513-B63C-C46F5D724AA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyncfusionBlazorApp1", "src\SyncfusionBlazorApp1\SyncfusionBlazorApp1.csproj", "{92F6DCC4-0628-46F7-98F6-6D409753748B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SyncfusionBlazorApp1", "src\SyncfusionBlazorApp1\SyncfusionBlazorApp1.csproj", "{92F6DCC4-0628-46F7-98F6-6D409753748B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorApp1", "src\BlazorApp1\BlazorApp1.csproj", "{D03434CE-283F-4845-8EF7-97C6997DB69B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,10 @@ Global
 		{92F6DCC4-0628-46F7-98F6-6D409753748B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92F6DCC4-0628-46F7-98F6-6D409753748B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92F6DCC4-0628-46F7-98F6-6D409753748B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D03434CE-283F-4845-8EF7-97C6997DB69B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D03434CE-283F-4845-8EF7-97C6997DB69B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D03434CE-283F-4845-8EF7-97C6997DB69B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D03434CE-283F-4845-8EF7-97C6997DB69B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -39,6 +45,7 @@ Global
 		{7FF839DB-E7DB-4A4B-AC74-8FF69622FC5B} = {EAAA0529-B8EF-407D-A4F5-AADF8F2A1C0A}
 		{3D7AB4F7-5717-4513-B63C-C46F5D724AA0} = {E0A53AA5-DF43-48C8-BAE3-23C1CFFEC760}
 		{92F6DCC4-0628-46F7-98F6-6D409753748B} = {E0A53AA5-DF43-48C8-BAE3-23C1CFFEC760}
+		{D03434CE-283F-4845-8EF7-97C6997DB69B} = {E0A53AA5-DF43-48C8-BAE3-23C1CFFEC760}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {373A82EB-8228-44A9-A972-7DCA4B677308}
