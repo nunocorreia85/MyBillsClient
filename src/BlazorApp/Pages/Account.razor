@@ -3,67 +3,44 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IHttpClientFactory ClientFactory
-@using Syncfusion.Blazor.InPlaceEditor
+@using Syncfusion.Blazor.Inputs
 @using Syncfusion.Blazor.Buttons
 
-<div class="row">
-    <div class="col-lg-6 control-section inplace-control-section default_layout">
-        <div class="control_wrapper">
-            <table>
-                <tr>
-                    <td>
-                        <h1>Account</h1>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label class="control-label">Name</label>
-                    </td>
-                    <td>
-                        <SfInPlaceEditor Mode="RenderMode.Inline" Type="InputType.Text" Value="@Name" SubmitOnEnter="false" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label class="control-label">Postal Code</label>
-                    </td>
-                    <td>
-                        <SfInPlaceEditor Mode="RenderMode.Inline" Type="InputType.Text" Value="@PostalCode" SubmitOnEnter="false" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label class="control-label">Country</label>
-                    </td>
-                    <td>
-                        <SfInPlaceEditor Mode="RenderMode.Inline" Type="InputType.Text" Value="@Country" SubmitOnEnter="false" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label class="control-label">Balance</label>
-                    </td>
-                    <td>
-                        <SfInPlaceEditor Mode="RenderMode.Inline" Type="InputType.Numeric" Value="@Balance" SubmitOnEnter="false" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label class="control-label">AccountNumber</label>
-                    </td>
-                    <td>
-                        <SfInPlaceEditor Mode="RenderMode.Inline" Type="InputType.Text" Value="@BankAccountNumber" SubmitOnEnter="false" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <SfButton>Normal</SfButton>
-                    </td>
-                </tr>
-            </table>
-        </div>
+<div class="control-section">
+    <div class="col-lg-12 control-section">        
+        <div class="content-wrapper">
+            <h1>Account</h1>
+            <div class="control-label">Name</div>
+            <SfTextBox @bind-Value="@Name"></SfTextBox>
+            <div class="control-label">Postal Code</div>
+            <SfTextBox @bind-Value="@PostalCode"></SfTextBox>
+            <div class="control-label">Country</div>
+            <SfTextBox @bind-Value="@Country"></SfTextBox>
+            <div class="control-label">Balance Code</div>
+            <SfNumericTextBox @bind-Value="@Balance" TValue="decimal" Format="c2"></SfNumericTextBox>
+            <div class="control-label">Bank Account</div>
+            <SfTextBox @bind-Value="@BankAccountNumber"></SfTextBox>
+            <SfButton CssClass="e-success" @onclick="@Submit">Submit</SfButton>
+        </div>        
     </div>
 </div>
+
+<style>
+    .content-wrapper {
+        width: 45%;
+        margin: 0 auto;
+        min-width: 185px;
+    }
+
+    .control-label {
+        padding: 24px 0px 10px 0px;
+        font-size: 12px;
+    }
+
+    .e-float-input.e-numeric.e-input-group {
+        margin-top: 40px;
+    }
+</style>
 
 @code {
 
@@ -75,7 +52,20 @@
     public string BankAccountNumber { get; set; }
     public string ExternalId { get; set; }
 
-    private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
+    public async Task Submit()
+    {
+        if(!string.IsNullOrEmpty(ExternalId))
+        {
+            var client = ClientFactory.CreateClient("serverAPI");
+            var command = new CreateAccountCommand()
+            {
+                Balance = Balance,
+                BankAccountNumber = BankAccountNumber,
+                ExternalId = Guid.NewGuid().ToString()
+            };
+            await client.PostAsJsonAsync<CreateAccountCommand>("accounts", command);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -97,8 +87,8 @@
         {
             var client = ClientFactory.CreateClient("serverAPI");
 
-            var accountText = await client.GetStringAsync("accounts?id=0");
-            Console.WriteLine(accountText);
+            var account = await client.GetStringAsync("accounts");
+            Console.WriteLine(account);
         }
         //catch (AccessTokenNotAvailableException exception)
         //{
@@ -117,6 +107,12 @@
         public decimal Balance { get; set; }
         public string BankAccountNumber { get; set; }
         public bool Closed { get; set; }
+    }
 
+    public class CreateAccountCommand
+    {
+        public string ExternalId { get; set; }
+        public decimal Balance { get; set; }
+        public string BankAccountNumber { get; set; }
     }
 }
