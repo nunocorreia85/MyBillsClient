@@ -42,8 +42,8 @@ namespace BlazorApp
             builder.Services.AddHttpClient("ServerAPI",
                     client =>
                     {
-                        client.BaseAddress = new Uri("https://mybillsapi-apim.azure-api.net/MyBillsApi/");
-                        client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", "2376a12ded1247db9533b2828f5ad593");
+                        client.BaseAddress = new Uri("https://mybillsapi.azurewebsites.net/api/");
+                        client.DefaultRequestHeaders.Add("x-functions-key", "rqaiKDUmqlaDinVZDSLCvpU8iyab5aB8FkOUuJf90Yygv7CVVMCXIA==");
                     })
                 .AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
 

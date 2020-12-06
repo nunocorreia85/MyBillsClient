@@ -10,7 +10,7 @@ namespace BlazorApp
             : base(provider, navigationManager)
         {
             ConfigureHandler(
-                authorizedUrls: new[] { "https://mybillsapi-apim.azure-api.net/MyBillsApi" },
+                authorizedUrls: new[] { "https://mybillsapi.azurewebsites.net/api" },
                 scopes: new[] { "https://mybills.onmicrosoft.com/api/default" });
         }
     }
