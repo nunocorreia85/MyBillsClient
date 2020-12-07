@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Syncfusion.Blazor.Inputs
 @using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Spinner
 @using MyBills.Application.Shared.Accounts.Commands
 @using MyBills.Domain.Entities
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
@@ -9,24 +10,32 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IHttpClientFactory ClientFactory
 
-<div class="control-section">
-    <div class="col-lg-12 control-section">
-        <div class="content-wrapper">
-            <h1>Account</h1>
-            <div class="control-label">Name</div>
-            <SfTextBox @bind-Value="@Name"></SfTextBox>
-            <div class="control-label">Postal Code</div>
-            <SfTextBox @bind-Value="@PostalCode"></SfTextBox>
-            <div class="control-label">Country</div>
-            <SfTextBox @bind-Value="@Country"></SfTextBox>
-            <div class="control-label">Balance Code</div>
-            <SfNumericTextBox @bind-Value="@Balance" TValue="decimal" Format="c2"></SfNumericTextBox>
-            <div class="control-label">Bank Account</div>
-            <SfTextBox @bind-Value="@BankAccountNumber"></SfTextBox>
-            <SfButton CssClass="e-success" @onclick="@Submit">Submit</SfButton>
+@if (IsLoading)
+{
+    <SfSpinner @bind-Visible="@IsLoading">
+    </SfSpinner>
+}
+else
+{
+    <div class="control-section">
+        <div class="col-lg-12 control-section">
+            <div class="content-wrapper">
+                <h1>Account</h1>
+                <div class="control-label">Name</div>
+                <SfTextBox @bind-Value="@Name"></SfTextBox>
+                <div class="control-label">Postal Code</div>
+                <SfTextBox @bind-Value="@PostalCode"></SfTextBox>
+                <div class="control-label">Country</div>
+                <SfTextBox @bind-Value="@Country"></SfTextBox>
+                <div class="control-label">Balance Code</div>
+                <SfNumericTextBox @bind-Value="@Balance" TValue="decimal" Format="c2"></SfNumericTextBox>
+                <div class="control-label">Bank Account</div>
+                <SfTextBox @bind-Value="@BankAccountNumber"></SfTextBox>
+                <SfButton CssClass="e-success" @onclick="@Submit" Content="@CreateOrUpdate"></SfButton>
+            </div>
         </div>
     </div>
-</div>
+}
 
 @code {
 
@@ -38,13 +47,16 @@
     public string ExternalId { get; set; }
     public long Id { get; set; }
     public bool HasAccount { get; set; }
+    public string CreateOrUpdate { get => HasAccount ? "Update" : "Create"; }
+    public bool IsLoading { get; set; }
 
     public async Task Submit()
     {
+        IsLoading = true;
         if (!string.IsNullOrEmpty(ExternalId))
         {
             var client = ClientFactory.CreateClient("ServerAPI");
-
+            HttpResponseMessage response;
             if (HasAccount)
             {
                 var updateCommand = new UpdateAccountCommand()
@@ -52,23 +64,28 @@
                     BankAccountNumber = BankAccountNumber,
                     Id = Id
                 };
-                await client.PutAsJsonAsync<UpdateAccountCommand>("accounts", updateCommand);
-                return;
+                response = await client.PutAsJsonAsync<UpdateAccountCommand>("accounts", updateCommand);
+
             }
-
-            var createCommand = new CreateAccountCommand()
+            else
             {
-                BankAccountNumber = BankAccountNumber,
-                Balance = Balance,
-                ExternalId = new Guid(ExternalId)
-            };
+                var createCommand = new CreateAccountCommand()
+                {
+                    BankAccountNumber = BankAccountNumber,
+                    Balance = Balance,
+                    ExternalId = new Guid(ExternalId)
+                };
 
-            await client.PostAsJsonAsync<CreateAccountCommand>("accounts", createCommand);
+                response = await client.PostAsJsonAsync<CreateAccountCommand>("accounts", createCommand);
+            }
         }
+
+        IsLoading = false;
     }
 
     protected override async Task OnInitializedAsync()
     {
+        IsLoading = true;
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
@@ -90,6 +107,7 @@
             var account = accounts.SingleOrDefault();
             if (account == null)
             {
+                IsLoading = false;
                 return;
             }
 
@@ -105,6 +123,10 @@
         catch (Exception e)
         {
             Console.WriteLine(e);
+        }
+        finally
+        {
+            IsLoading = false;
         }
     }
 }

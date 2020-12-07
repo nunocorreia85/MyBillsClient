@@ -42,7 +42,8 @@ namespace BlazorApp
             builder.Services.AddHttpClient("ServerAPI",
                     client =>
                     {
-                        client.BaseAddress = new Uri("https://mybillsapi.azurewebsites.net/api/");
+                        //client.BaseAddress = new Uri("https://mybillsapi.azurewebsites.net/api/");
+                        client.BaseAddress = new Uri("http://localhost:7001/api/");
                         client.DefaultRequestHeaders.Add("x-functions-key", "rqaiKDUmqlaDinVZDSLCvpU8iyab5aB8FkOUuJf90Yygv7CVVMCXIA==");
                     })
                 .AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
