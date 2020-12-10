@@ -1,12 +1,8 @@
 @page "/account"
-@using Microsoft.AspNetCore.Components.Authorization
-@using Syncfusion.Blazor.Inputs
-@using Syncfusion.Blazor.Buttons
-@using Syncfusion.Blazor.Spinner
+
 @using MyBills.Application.Shared.Accounts.Commands
-@using MyBills.Domain
-@using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-@using Syncfusion.Blazor.DropDowns
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IHttpClientFactory ClientFactory
@@ -18,39 +14,42 @@
 }
 else
 {
-
-    <form>
-        <div class="mb-3">
-            <label for="emails" class="form-label">Email address</label>
-            <SfMultiSelect ID="emails" Value="@Emails" TValue="string[]" Mode="@VisualMode.Default" Placeholder="Favorite Sports" DataSource="@Emails" />
-            <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
-        </div>
-        <div class="mb-3">
-            <label for="name" class="form-label">Name</label>
-            <input type="text" disabled class="form-control" id="name" value="@Name">
-        </div>
-        <div class="mb-3 form-check">
-            <input type="checkbox" class="form-check-input" id="isActive">
-            <label class="form-check-label" for="isActive">Is Active</label>
-        </div>
-        <div class="mb-3">
-            <label for="postalCode" class="form-label">PostalCode</label>
-            <input type="text" disabled class="form-control" id="postalCode" value="@PostalCode">
-        </div>
-        <div class="mb-3">
-            <label for="country" class="form-label">Country</label>
-            <input type="text" disabled class="form-control" id="country" value="@Country">
-        </div>
-        <div class="mb-3">
-            <label for="balance" class="form-label">Balance</label>
-            <SfNumericTextBox ID="balance" @bind-Value="@Balance" TValue="decimal" Format="c2" />
-        </div>
-        <div class="mb-3">
-            <label for="bankAccountNumber" class="form-label">Bank Account</label>
-            <SfTextBox ID="bankAccountNumber" @bind-Value="@BankAccountNumber" />
-        </div>
-        <SfButton CssClass="e-success" @onclick="@Submit" Content="@CreateOrUpdate" />
-    </form>
+    <div class="container-sm">
+        <form>
+            <div class="mb-3">
+                <label for="emails" class="form-label">Email address</label>
+                <SfMultiSelect ID="emails" Value="@Emails" TValue="string[]" Mode="@VisualMode.Default" Placeholder="Favorite Sports" DataSource="@Emails"/>
+                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+            </div>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" disabled class="form-control" id="name" value="@Name">
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="isActive">
+                <label class="form-check-label" for="isActive">Is Active</label>
+            </div>
+            <div class="mb-3">
+                <label for="postalCode" class="form-label">PostalCode</label>
+                <input type="text" disabled class="form-control" id="postalCode" value="@PostalCode">
+            </div>
+            <div class="mb-3">
+                <label for="country" class="form-label">Country</label>
+                <input type="text" disabled class="form-control" id="country" value="@Country">
+            </div>
+            <div class="mb-3">
+                <label for="balance" class="form-label">Balance</label>
+                <SfNumericTextBox ID="balance" @bind-Value="@Balance" TValue="decimal" Format="c2"/>
+            </div>
+            <div class="mb-3">
+                <label for="bankAccountNumber" class="form-label">Bank Account</label>
+                <SfTextBox ID="bankAccountNumber" @bind-Value="@BankAccountNumber"/>
+            </div>
+            <div class="mb-3">
+                <SfButton CssClass="e-success" @onclick="@Submit" Content="@CreateOrUpdate"/>
+            </div>
+        </form>
+    </div>
 }
 
 @code {
@@ -63,7 +62,7 @@ else
     public string ExternalId { get; set; }
     public long Id { get; set; }
     public bool HasAccount { get; set; }
-    public string CreateOrUpdate { get => HasAccount ? "Update" : "Create"; }
+    public string CreateOrUpdate => HasAccount ? "Update" : "Create";
     public bool IsLoading { get; set; }
     public string[] Emails { get; set; }
 
@@ -76,24 +75,23 @@ else
             HttpResponseMessage response;
             if (HasAccount)
             {
-                var updateCommand = new UpdateAccountCommand()
+                var updateCommand = new UpdateAccountCommand
                 {
                     BankAccountNumber = BankAccountNumber,
                     Id = Id
                 };
-                response = await client.PutAsJsonAsync<UpdateAccountCommand>("accounts", updateCommand);
-
+                response = await client.PutAsJsonAsync("accounts", updateCommand);
             }
             else
             {
-                var createCommand = new CreateAccountCommand()
+                var createCommand = new CreateAccountCommand
                 {
                     BankAccountNumber = BankAccountNumber,
                     Balance = Balance,
                     ExternalId = new Guid(ExternalId)
                 };
 
-                response = await client.PostAsJsonAsync<CreateAccountCommand>("accounts", createCommand);
+                response = await client.PostAsJsonAsync("accounts", createCommand);
             }
         }
 
@@ -111,7 +109,7 @@ else
             return;
         }
 
-        Emails = System.Text.Json.JsonSerializer.Deserialize<string[]>(user.FindFirst("emails")?.Value);
+        Emails = JsonSerializer.Deserialize<string[]>(user.FindFirst("emails")?.Value);
         ExternalId = user.FindFirst("oid")?.Value;
         Name = user.FindFirst("name")?.Value;
         PostalCode = user.FindFirst("postalCode")?.Value;
@@ -153,4 +151,5 @@ else
             IsLoading = false;
         }
     }
+
 }
