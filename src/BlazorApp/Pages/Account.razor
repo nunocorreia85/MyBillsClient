@@ -17,24 +17,31 @@
 }
 else
 {
-    <div class="control-section">
-        <div class="col-lg-12 control-section">
-            <div class="content-wrapper">
-                <h1>Account</h1>
-                <div class="control-label">Name</div>
-                <SfTextBox @bind-Value="@Name"></SfTextBox>
-                <div class="control-label">Postal Code</div>
-                <SfTextBox @bind-Value="@PostalCode"></SfTextBox>
-                <div class="control-label">Country</div>
-                <SfTextBox @bind-Value="@Country"></SfTextBox>
-                <div class="control-label">Balance Code</div>
-                <SfNumericTextBox @bind-Value="@Balance" TValue="decimal" Format="c2"></SfNumericTextBox>
-                <div class="control-label">Bank Account</div>
-                <SfTextBox @bind-Value="@BankAccountNumber"></SfTextBox>
-                <SfButton CssClass="e-success" @onclick="@Submit" Content="@CreateOrUpdate"></SfButton>
-            </div>
-        </div>
-    </div>
+
+<div class="row">
+    <div class="col-sm-4">Name</div>
+    <div class="col">@Name</div>
+</div>
+<div class="row">
+    <div class="col-sm-4">Postal Code</div>
+    <div class="col">@PostalCode</div>
+</div>
+<div class="row">
+    <div class="col-sm-4">Country</div>
+    <div class="col">@Country</div>
+</div>
+<div class="row">
+    <div class="col-sm-4">Balance Code</div>    
+    <div class="col"><SfNumericTextBox @bind-Value="@Balance" TValue="decimal" Format="c2" /></div>
+</div>
+<div class="row">
+    <div class="col-sm-4">Bank Account</div>
+    <div class="col"><SfTextBox @bind-Value="@BankAccountNumber" /></div>
+</div>
+<div class="row">
+    <div class="col-3"><SfButton CssClass="e-success" @onclick="@Submit" Content="@CreateOrUpdate"></SfButton></div>        
+</div>
+
 }
 
 @code {
