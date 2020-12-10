@@ -4,8 +4,9 @@
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Spinner
 @using MyBills.Application.Shared.Accounts.Commands
-@using MyBills.Domain.Entities
+@using MyBills.Domain
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+@using Syncfusion.Blazor.DropDowns
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IHttpClientFactory ClientFactory
@@ -18,30 +19,38 @@
 else
 {
 
-<div class="row">
-    <div class="col-sm-4">Name</div>
-    <div class="col">@Name</div>
-</div>
-<div class="row">
-    <div class="col-sm-4">Postal Code</div>
-    <div class="col">@PostalCode</div>
-</div>
-<div class="row">
-    <div class="col-sm-4">Country</div>
-    <div class="col">@Country</div>
-</div>
-<div class="row">
-    <div class="col-sm-4">Balance Code</div>    
-    <div class="col"><SfNumericTextBox @bind-Value="@Balance" TValue="decimal" Format="c2" /></div>
-</div>
-<div class="row">
-    <div class="col-sm-4">Bank Account</div>
-    <div class="col"><SfTextBox @bind-Value="@BankAccountNumber" /></div>
-</div>
-<div class="row">
-    <div class="col-3"><SfButton CssClass="e-success" @onclick="@Submit" Content="@CreateOrUpdate"></SfButton></div>        
-</div>
-
+    <form>
+        <div class="mb-3">
+            <label for="emails" class="form-label">Email address</label>
+            <SfMultiSelect ID="emails" Value="@Emails" TValue="string[]" Mode="@VisualMode.Default" Placeholder="Favorite Sports" DataSource="@Emails" />
+            <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+        </div>
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" disabled class="form-control" id="name" value="@Name">
+        </div>
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="isActive">
+            <label class="form-check-label" for="isActive">Is Active</label>
+        </div>
+        <div class="mb-3">
+            <label for="postalCode" class="form-label">PostalCode</label>
+            <input type="text" disabled class="form-control" id="postalCode" value="@PostalCode">
+        </div>
+        <div class="mb-3">
+            <label for="country" class="form-label">Country</label>
+            <input type="text" disabled class="form-control" id="country" value="@Country">
+        </div>
+        <div class="mb-3">
+            <label for="balance" class="form-label">Balance</label>
+            <SfNumericTextBox ID="balance" @bind-Value="@Balance" TValue="decimal" Format="c2" />
+        </div>
+        <div class="mb-3">
+            <label for="bankAccountNumber" class="form-label">Bank Account</label>
+            <SfTextBox ID="bankAccountNumber" @bind-Value="@BankAccountNumber" />
+        </div>
+        <SfButton CssClass="e-success" @onclick="@Submit" Content="@CreateOrUpdate" />
+    </form>
 }
 
 @code {
@@ -56,6 +65,7 @@ else
     public bool HasAccount { get; set; }
     public string CreateOrUpdate { get => HasAccount ? "Update" : "Create"; }
     public bool IsLoading { get; set; }
+    public string[] Emails { get; set; }
 
     public async Task Submit()
     {
@@ -101,16 +111,22 @@ else
             return;
         }
 
+        Emails = System.Text.Json.JsonSerializer.Deserialize<string[]>(user.FindFirst("emails")?.Value);
         ExternalId = user.FindFirst("oid")?.Value;
         Name = user.FindFirst("name")?.Value;
         PostalCode = user.FindFirst("postalCode")?.Value;
         Country = user.FindFirst("country")?.Value;
 
+        foreach (var item in user.Claims)
+        {
+            Console.WriteLine($"{item.Value} {item.ValueType} {item.Type}");
+        }
+
         try
         {
             var client = ClientFactory.CreateClient("ServerAPI");
 
-            var accounts = await client.GetFromJsonAsync<List<Account>>($"accounts?externalIds={ExternalId}");
+            var accounts = await client.GetFromJsonAsync<List<MyBills.Domain.Entities.Account>>($"accounts?externalIds={ExternalId}");
             var account = accounts.SingleOrDefault();
             if (account == null)
             {
@@ -120,6 +136,7 @@ else
 
             Balance = account.Balance;
             BankAccountNumber = account.BankAccountNumber;
+            var closed = account.Closed;
             Id = account.Id;
             HasAccount = true;
         }
