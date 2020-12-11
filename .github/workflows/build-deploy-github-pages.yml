@@ -18,10 +18,12 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.100
-    - name: restore
-      run: dotnet restore
+    - name: Add Nuget Source
+      run: dotnet nuget add source https://nuget.pkg.github.com/nunocorreia85/index.json -n github -u nunocorreia85 -p ${{ env.GITHUB_TOKEN }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Restore, Build and Publish
-      run: dotnet publish --configuration Release --no-restore src/BlazorApp/BlazorApp.csproj
+      run: dotnet publish --configuration Release src/BlazorApp/BlazorApp.csproj
     - name: Rewrite base href
       uses: SteveSandersonMS/ghaction-rewrite-base-href@v1
       with:
