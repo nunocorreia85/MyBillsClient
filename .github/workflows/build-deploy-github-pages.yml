@@ -19,7 +19,7 @@ jobs:
       with:
         dotnet-version: 5.0.100
     - name: restore
-      run: dotnet restore --configfile nuget.config
+      run: dotnet restore
     - name: Restore, Build and Publish
       run: dotnet publish --configuration Release --no-restore src/BlazorApp/BlazorApp.csproj
     - name: Rewrite base href
