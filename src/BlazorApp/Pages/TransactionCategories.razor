@@ -1,0 +1,32 @@
+﻿@using Syncfusion.Blazor.Grids
+@using MyBills.Domain.Entities
+@using MyBills.Domain.Enums
+
+@page "/categories"
+
+<h3>TransactionCategories</h3>
+
+<SfGrid DataSource="@BankTransactionCategories" AllowPaging="true">
+ <GridPageSettings PageSize="5"></GridPageSettings>
+   <GridColumns>
+     <GridColumn Field=@nameof(TransactionCategory.Created) HeaderText="Created" Format="d" Type="ColumnType.Date" TextAlign="TextAlign.Right" Width="130"></GridColumn>
+     <GridColumn Field=@nameof(TransactionCategory.Description) HeaderText="Description" Width="150"></GridColumn>
+     <GridColumn Field=@nameof(TransactionCategory.RecurringPeriod) HeaderText="Recurring Period" TextAlign="TextAlign.Right" Width="120"></GridColumn>
+     <GridColumn Field=@nameof(TransactionCategory.Name) HeaderText="Name" TextAlign="TextAlign.Right" Width="120"></GridColumn>
+   </GridColumns>
+</SfGrid>
+
+@code {
+    private List<TransactionCategory> BankTransactionCategories { get; set; }
+
+    protected override void OnInitialized()
+    {
+        BankTransactionCategories = Enumerable.Range(1, 75).Select(x => new TransactionCategory()
+        {
+            Created = DateTime.Now,
+            Description = "Description" + x,
+            RecurringPeriod = RecurringPeriod.Month,
+            Name = "Category name" + x
+        }).ToList();
+    }
+}
