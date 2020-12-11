@@ -19,7 +19,7 @@ jobs:
       with:
         dotnet-version: 5.0.100
     - name: Add Nuget Source
-      run: dotnet nuget add source https://nuget.pkg.github.com/nunocorreia85/index.json -n githubsource -u nunocorreia85 -p ${{ env.GITHUB_TOKEN }}
+      run: dotnet restore --configfile nuget.config
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Restore, Build and Publish
