@@ -7,6 +7,7 @@
 <h3>TransactionCategories</h3>
 
 <SfGrid DataSource="@BankTransactionCategories" AllowPaging="true">
+ <GridEditSettings AllowAdding="true" AllowDeleting="true" AllowEditing="true"></GridEditSettings>
  <GridPageSettings PageSize="5"></GridPageSettings>
    <GridColumns>
      <GridColumn Field=@nameof(TransactionCategory.Created) HeaderText="Created" Format="d" Type="ColumnType.Date" TextAlign="TextAlign.Right" Width="130"></GridColumn>

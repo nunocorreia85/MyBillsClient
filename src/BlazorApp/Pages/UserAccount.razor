@@ -1,98 +1,85 @@
 @page "/userAccount"
 
 @using MyBills.Application.Shared.Accounts.Commands
+@using MyBills.Domain.Entities
 @using System.Text.Json
-@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IHttpClientFactory ClientFactory
-
-@if (IsLoading)
-{
-    <SfSpinner @bind-Visible="@IsLoading">
-    </SfSpinner>
-}
-else
-{
-    <div class="container-sm">
+<div class="container-sm">
+    @if (IsLoading)
+    {
+        <SfSpinner @bind-Visible="@IsLoading"></SfSpinner>    }
+    else
+    {
         <form>
             <div class="mb-3">
                 <label for="emails" class="form-label">Email address</label>
-                <SfMultiSelect ID="emails" Value="@Emails" TValue="string[]" Mode="@VisualMode.Default" Placeholder="Favorite Sports" DataSource="@Emails"/>
+                <SfMultiSelect ID="emails" Value="@Model.Emails" TValue="string[]" Mode="@VisualMode.Default" Placeholder="Favorite Sports" DataSource="@Model.Emails"/>
                 <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
             </div>
             <div class="mb-3">
                 <label for="name" class="form-label">Name</label>
-                <input type="text" disabled class="form-control" id="name" value="@Name">
-            </div>
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="isActive">
-                <label class="form-check-label" for="isActive">Is Active</label>
+                <input type="text" disabled class="form-control" id="name" value="@Model.Name">
             </div>
             <div class="mb-3">
                 <label for="postalCode" class="form-label">PostalCode</label>
-                <input type="text" disabled class="form-control" id="postalCode" value="@PostalCode">
+                <input type="text" disabled class="form-control" id="postalCode" value="@Model.PostalCode">
             </div>
             <div class="mb-3">
                 <label for="country" class="form-label">Country</label>
-                <input type="text" disabled class="form-control" id="country" value="@Country">
+                <input type="text" disabled class="form-control" id="country" value="@Model.Country">
             </div>
             <div class="mb-3">
                 <label for="balance" class="form-label">Balance</label>
-                <SfNumericTextBox ID="balance" @bind-Value="@Balance" TValue="decimal" Format="c2"/>
+                <SfNumericTextBox ID="balance" @bind-Value="@Model.Balance" TValue="decimal" Format="c2"/>
             </div>
             <div class="mb-3">
                 <label for="bankAccountNumber" class="form-label">Bank Account</label>
-                <SfTextBox ID="bankAccountNumber" @bind-Value="@BankAccountNumber"/>
+                <SfTextBox ID="bankAccountNumber" @bind-Value="@Model.BankAccountNumber"/>
             </div>
             <div class="mb-3">
-                <SfButton CssClass="e-success" @onclick="@Submit" Content="@CreateOrUpdate"/>
+                <SfButton CssClass="e-success" @onclick="@Submit" Content="@Model.CreateOrUpdate"/>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="isClosed" checked="@Model.Closed">
+                <label class="form-check-label" for="isClosed">Is Closed</label>
             </div>
         </form>
-    </div>
-}
+    }
+</div>
 
 @code {
 
-    public string Name { get; set; }
-    public string PostalCode { get; set; }
-    public string Country { get; set; }
-    public decimal Balance { get; set; }
-    public string BankAccountNumber { get; set; }
-    public string ExternalId { get; set; }
-    public long Id { get; set; }
-    public bool HasAccount { get; set; }
-    public string CreateOrUpdate => HasAccount ? "Update" : "Create";
-    public bool IsLoading { get; set; }
-    public string[] Emails { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
-    public async Task Submit()
+    private bool IsLoading { get; set; }
+    private AccountModel Model { get; set; }
+
+    private async Task Submit()
     {
         IsLoading = true;
-        if (!string.IsNullOrEmpty(ExternalId))
+        var client = ClientFactory.CreateClient("ServerAPI");
+        if (Model.HasAccount)
         {
-            var client = ClientFactory.CreateClient("ServerAPI");
-            HttpResponseMessage response;
-            if (HasAccount)
+            var updateCommand = new UpdateAccountCommand
             {
-                var updateCommand = new UpdateAccountCommand
-                {
-                    BankAccountNumber = BankAccountNumber,
-                    Id = Id
-                };
-                response = await client.PutAsJsonAsync("accounts", updateCommand);
-            }
-            else
+                BankAccountNumber = Model.BankAccountNumber,
+                Id = Model.Id
+            };
+            await client.PutAsJsonAsync("accounts", updateCommand);
+        }
+        else
+        {
+            var createCommand = new CreateAccountCommand
             {
-                var createCommand = new CreateAccountCommand
-                {
-                    BankAccountNumber = BankAccountNumber,
-                    Balance = Balance,
-                    ExternalId = new Guid(ExternalId)
-                };
+                BankAccountNumber = Model.BankAccountNumber,
+                Balance = Model.Balance,
+                ExternalId = Model.ExternalId
+            };
 
-                response = await client.PostAsJsonAsync("accounts", createCommand);
-            }
+            await client.PostAsJsonAsync("accounts", createCommand);
         }
 
         IsLoading = false;
@@ -101,55 +88,70 @@ else
     protected override async Task OnInitializedAsync()
     {
         IsLoading = true;
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var authState = await AuthenticationStateTask;
         var user = authState.User;
 
-        if (!user.Identity.IsAuthenticated)
+        if (user?.Identity == null || !user.Identity.IsAuthenticated)
         {
             return;
         }
 
-        Emails = JsonSerializer.Deserialize<string[]>(user.FindFirst("emails")?.Value);
-        ExternalId = user.FindFirst("oid")?.Value;
-        Name = user.FindFirst("name")?.Value;
-        PostalCode = user.FindFirst("postalCode")?.Value;
-        Country = user.FindFirst("country")?.Value;
-
-        foreach (var item in user.Claims)
+        var externalId = user.FindFirst("oid");
+        var emails = user.FindFirst("emails");
+        if (externalId == null || emails == null)
         {
-            Console.WriteLine($"{item.Value} {item.ValueType} {item.Type}");
+            return;
         }
 
         try
         {
             var client = ClientFactory.CreateClient("ServerAPI");
-
-            var accounts = await client.GetFromJsonAsync<List<MyBills.Domain.Entities.Account>>($"accounts?externalIds={ExternalId}");
-            var account = accounts.SingleOrDefault();
+            var accounts = await client.GetFromJsonAsync<List<Account>>($"accounts?externalIds={externalId.Value}");
+            var account = accounts?.SingleOrDefault();
             if (account == null)
             {
                 IsLoading = false;
                 return;
             }
 
-            Balance = account.Balance;
-            BankAccountNumber = account.BankAccountNumber;
-            var closed = account.Closed;
-            Id = account.Id;
-            HasAccount = true;
+            Model = new AccountModel(account)
+            {
+                HasAccount = true,
+                Emails = JsonSerializer.Deserialize<string[]>(emails.Value),
+                ExternalId = new Guid(externalId.Value),
+                Name = user.FindFirst("name")?.Value,
+                PostalCode = user.FindFirst("postalCode")?.Value,
+                Country = user.FindFirst("country")?.Value
+            };
         }
         catch (AccessTokenNotAvailableException exception)
         {
             exception.Redirect();
         }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
         finally
         {
             IsLoading = false;
         }
+    }
+
+    private class AccountModel : Account
+    {
+        public AccountModel(Account account)
+        {
+            if (account == null) return;
+            Balance = account.Balance;
+            Closed = account.Closed;
+            Id = account.Id;
+            ExternalId = account.ExternalId;
+            BankAccountNumber = account.BankAccountNumber;
+        }
+
+        public string Name { get; init; }
+        public string PostalCode { get; init; }
+        public string Country { get; init; }
+        public bool HasAccount { get; init; }
+        public string CreateOrUpdate => HasAccount ? "Update" : "Create";
+        public string[] Emails { get; init; }
     }
 
 }
