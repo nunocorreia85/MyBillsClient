@@ -1,12 +1,14 @@
 ﻿@using Syncfusion.Blazor.Grids
 @using MyBills.Domain.Entities
 @using MyBills.Domain.Enums
-
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Data
 @page "/categories"
 
 <h3>TransactionCategories</h3>
 
 <SfGrid DataSource="@BankTransactionCategories" AllowPaging="true">
+ @* <SfDataManager AdaptorInstance="@typeof(TransactionCategoryAdaptor)" Adaptor="Adaptors.CustomAdaptor"></SfDataManager> *@
  <GridEditSettings AllowAdding="true" AllowDeleting="true" AllowEditing="true"></GridEditSettings>
  <GridPageSettings PageSize="5"></GridPageSettings>
    <GridColumns>
@@ -29,5 +31,19 @@
             RecurringPeriod = RecurringPeriod.Month,
             Name = "Category name" + x
         }).ToList();
+    }
+
+    public class TransactionCategoryAdaptor : DataAdaptor
+    {
+        public override object Read(DataManagerRequest dm, string key = null)
+        {
+            return null;
+            // return dm.RequiresCounts ? new DataResult() { Result = DataSource, Count = count } : (object)DataSource;
+        }
+
+        public override object Insert(DataManager dataManager, object data, string key)
+        {
+            return base.Insert(dataManager, data, key);
+        }
     }
 }
