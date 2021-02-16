@@ -2,7 +2,10 @@
 
 @using MyBills.Application.Shared.Accounts.Commands
 @using MyBills.Domain.Entities
-@using System.Text.Json
+@using Models;
+@using System.Security.Claims;
+ 
+@using System.Text.Json 
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IHttpClientFactory ClientFactory
@@ -15,7 +18,7 @@
         <form>
             <div class="mb-3">
                 <label for="emails" class="form-label">Email address</label>
-                <SfMultiSelect ID="emails" Value="@Model.Emails" TValue="string[]" Mode="@VisualMode.Default" Placeholder="Favorite Sports" DataSource="@Model.Emails"/>
+                <SfMultiSelect ID="emails" Value="@Model.Emails" Enabled="false" TValue="string[]" Mode="@VisualMode.Default" Placeholder="Favorite Sports" DataSource="@Model.Emails"/>
                 <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
             </div>
             <div class="mb-3">
@@ -55,7 +58,10 @@
     private Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
     private bool IsLoading { get; set; }
+
     private AccountModel Model { get; set; }
+
+    public List<Claim> Claims { get; set; }
 
     private async Task Submit()
     {
@@ -90,33 +96,29 @@
         IsLoading = true;
         var authState = await AuthenticationStateTask;
         var user = authState.User;
-
+        var Claims = user.Claims.ToList();
         if (user?.Identity == null || !user.Identity.IsAuthenticated)
         {
             return;
         }
 
         var externalId = user.FindFirst("oid");
-        var emails = user.FindFirst("emails");
-        if (externalId == null || emails == null)
+
+        if (externalId == null)
         {
             return;
         }
 
+        var emails = user.FindFirst("emails");
+
         try
         {
             var client = ClientFactory.CreateClient("ServerAPI");
-            var accounts = await client.GetFromJsonAsync<List<Account>>($"accounts?externalIds={externalId.Value}");
+            var accounts = await client.GetFromJsonAsync<List<Account>>("accounts");
             var account = accounts?.SingleOrDefault();
-            if (account == null)
-            {
-                IsLoading = false;
-                return;
-            }
 
             Model = new AccountModel(account)
             {
-                HasAccount = true,
                 Emails = JsonSerializer.Deserialize<string[]>(emails.Value),
                 ExternalId = new Guid(externalId.Value),
                 Name = user.FindFirst("name")?.Value,
@@ -133,25 +135,4 @@
             IsLoading = false;
         }
     }
-
-    private class AccountModel : Account
-    {
-        public AccountModel(Account account)
-        {
-            if (account == null) return;
-            Balance = account.Balance;
-            Closed = account.Closed;
-            Id = account.Id;
-            ExternalId = account.ExternalId;
-            BankAccountNumber = account.BankAccountNumber;
-        }
-
-        public string Name { get; init; }
-        public string PostalCode { get; init; }
-        public string Country { get; init; }
-        public bool HasAccount { get; init; }
-        public string CreateOrUpdate => HasAccount ? "Update" : "Create";
-        public string[] Emails { get; init; }
-    }
-
 }

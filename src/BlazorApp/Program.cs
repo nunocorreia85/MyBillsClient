@@ -7,6 +7,9 @@ using BlazorApp.Shared;
 using Microsoft.JSInterop;
 using Syncfusion.Blazor;
 using System.Globalization;
+using System.Net.Http;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Microsoft.Authentication.WebAssembly.Msal.Models;
 
 namespace BlazorApp
 {
@@ -14,21 +17,35 @@ namespace BlazorApp
     {
         public static async Task Main(string[] args)
         {
-            Syncfusion.Licensing.SyncfusionLicenseProvider
-                .RegisterLicense("MzU2NzAxQDMxMzgyZTMzMmUzMFdNbUtVakxBTFc5RkVNTTR5WDRvRnBaMkp0VnBoRVlyellpRTV6Nmh3a2s9");
+            ConfigureSyncfusionLicense();
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
-            builder.Services.AddSyncfusionBlazor();
-            builder.Services.AddSingleton(typeof(ISyncfusionStringLocalizer), typeof(SyncfusionLocalizer));
+            RegisterSyncfusion(builder);
 
-            // Set the default culture of the application
-            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
-            CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-US");
-
-            // Get the modified culture from culture switcher
             var host = builder.Build();
+
+            SetDefaultApplicationCulture();
+
             var jsInterop = host.Services.GetRequiredService<IJSRuntime>();
             var result = await jsInterop.InvokeAsync<string>("cultureInfo.get");
+            
+            ConfigureCultureSwitcher(result);
+
+            builder.Services
+                .AddScoped<CustomAuthorizationMessageHandler>();
+
+            builder.Services
+                .AddHttpClient("ServerAPI", ConfigureApi())
+                .AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
+
+            builder.Services
+                .AddMsalAuthentication(ConfigureAuthentication(builder));
+
+            await builder.Build().RunAsync();
+        }
+
+        private static void ConfigureCultureSwitcher(string result)
+        {
             if (result != null)
             {
                 // Set the culture from culture switcher
@@ -36,19 +53,29 @@ namespace BlazorApp
                 CultureInfo.DefaultThreadCurrentCulture = culture;
                 CultureInfo.DefaultThreadCurrentUICulture = culture;
             }
+        }
 
-            builder.Services.AddScoped<CustomAuthorizationMessageHandler>();
+        private static void SetDefaultApplicationCulture()
+        {
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
+            CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-US");
+        }
 
-            builder.Services.AddHttpClient("ServerAPI",
-                    client =>
-                    {
-                        client.BaseAddress = new Uri("https://mybillsapi.azurewebsites.net/api/");
-                        //client.BaseAddress = new Uri("http://localhost:7001/api/");
-                        client.DefaultRequestHeaders.Add("x-functions-key", "rqaiKDUmqlaDinVZDSLCvpU8iyab5aB8FkOUuJf90Yygv7CVVMCXIA==");
-                    })
-                .AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
+        private static void RegisterSyncfusion(WebAssemblyHostBuilder builder)
+        {
+            builder.Services.AddSyncfusionBlazor();
+            builder.Services.AddSingleton(typeof(ISyncfusionStringLocalizer), typeof(SyncfusionLocalizer));
+        }
 
-            builder.Services.AddMsalAuthentication(options =>
+        private static void ConfigureSyncfusionLicense()
+        {
+            Syncfusion.Licensing.SyncfusionLicenseProvider
+                            .RegisterLicense("MzU2NzAxQDMxMzgyZTMzMmUzMFdNbUtVakxBTFc5RkVNTTR5WDRvRnBaMkp0VnBoRVlyellpRTV6Nmh3a2s9");
+        }
+
+        private static Action<RemoteAuthenticationOptions<MsalProviderOptions>> ConfigureAuthentication(WebAssemblyHostBuilder builder)
+        {
+            return options =>
             {
                 builder.Configuration.Bind("AzureAdB2C", options.ProviderOptions.Authentication);
                 options.ProviderOptions.DefaultAccessTokenScopes.Add("openid");
@@ -56,9 +83,17 @@ namespace BlazorApp
                 options.ProviderOptions.DefaultAccessTokenScopes.Add("https://mybills.onmicrosoft.com/api/default");
                 // no popup window
                 options.ProviderOptions.LoginMode = "redirect";
-            });
+            };
+        }
 
-            await builder.Build().RunAsync();
+        private static Action<HttpClient> ConfigureApi()
+        {
+            return client =>
+            {
+                //client.BaseAddress = new Uri("https://mybillsapi.azurewebsites.net/api/");
+                client.BaseAddress = new Uri("http://localhost:7071/api/");
+                client.DefaultRequestHeaders.Add("x-functions-key", "rqaiKDUmqlaDinVZDSLCvpU8iyab5aB8FkOUuJf90Yygv7CVVMCXIA==");
+            };
         }
     }
 }
